@@ -46,4 +46,4 @@ TIPS:
 
 NOTE:
 - The program uses a simplified deck of cards (2 to 11) with 11 representing an Ace.
-Enjoy the Blackjack experience, and have fun playing!
+- Enjoy the Blackjack experience, and have fun playing!
