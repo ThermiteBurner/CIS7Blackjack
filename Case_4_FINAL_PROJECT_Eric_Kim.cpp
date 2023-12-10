@@ -1,0 +1,125 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+// Function to calculate the probability of winning for a given hand value
+double calculateProbability(int playerTotal, const vector<int>& remainingCards) {
+    int favorableOutcomes = 0;
+
+    for (int card : remainingCards) 
+    {
+        if (playerTotal + card <= 21) 
+        {
+            favorableOutcomes++;
+        }
+    }
+
+    return static_cast<double>(favorableOutcomes) / remainingCards.size();
+}
+
+// Function to draw a card from the deck
+int drawCard(vector<int>& deck) 
+{
+    if (deck.empty()) 
+    {
+        cerr << "Error: No cards left in the deck!" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    int index = rand() % deck.size();
+    int card = deck[index];
+    deck.erase(deck.begin() + index);
+
+    return card;
+}
+
+// Function to display the player and dealer hands
+void displayHands(int playerTotal, int dealerTotal, bool showAll) 
+{
+    cout << "Player hand: " << playerTotal << endl;
+    if (showAll) 
+    {
+        cout << "Dealer hand: " << dealerTotal << endl;
+    } 
+    else 
+    {
+        cout << "Dealer hand: " << "???" << endl;
+    }
+}
+
+int main() 
+{
+    srand(static_cast<unsigned int>(time(nullptr)));
+
+    // Initialize the deck
+    vector<int> deck = {2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11};  // 11 represents Ace
+
+    // Shuffle the deck
+    random_shuffle(deck.begin(), deck.end());
+
+    // Initial deal
+    int playerHand = drawCard(deck) + drawCard(deck);
+    int dealerHand = drawCard(deck);
+
+    displayHands(playerHand, dealerHand, false);
+
+    // Calculate initial winning probability for the player
+    double initialProbability = calculateProbability(playerHand, deck);
+    cout << "Initial Winning Probability: " << initialProbability * 100 << "%" << endl;
+
+    // Player's turn
+    char choice;
+    do 
+    {
+        cout << "Do you want to hit? (y/n): ";
+        cin >> choice;
+
+        if (choice == 'y') 
+        {
+            int newCard = drawCard(deck);
+            playerHand += newCard;
+            cout << "New card: " << newCard << endl;
+            displayHands(playerHand, dealerHand, false);
+
+            // Calculate updated winning probability for the player
+            double updatedProbability = calculateProbability(playerHand, deck);
+            cout << "Updated Winning Probability: " << updatedProbability * 100 << "%" << endl;
+
+            if (playerHand > 21) 
+            {
+                cout << "Bust! Player loses." << endl;
+                return 0;
+            }
+        }
+
+    } 
+    while (choice == 'y');
+
+    // Dealer's turn
+    while (dealerHand < 17) 
+    {
+        int newCard = drawCard(deck);
+        dealerHand += newCard;
+    }
+    displayHands(playerHand, dealerHand, true);
+
+    // Determine the winner
+    if (dealerHand > 21 || (playerHand <= 21 && playerHand > dealerHand)) 
+    {
+        cout << "Player wins!" << endl;
+    } 
+    else if (playerHand == dealerHand) 
+    {
+        cout << "It's a tie!" << endl;
+    } 
+    else 
+    {
+        cout << "Dealer wins!" << endl;
+    }
+
+    return 0;
+}
